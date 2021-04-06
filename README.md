@@ -15,7 +15,7 @@ kubectl -> kube control is the command line tool. It is used to deploy and manag
 
 # Kubernetes Concepts
 ## PODS
-Containers are encapsulated into an object PODs. A pod is a single instance of an application.
+Containers are encapsulated into an object PODs. A POD is a single instance of an application.
 <br>
 It is the smallest object we can create in kubernetes.
 <br>
@@ -23,7 +23,25 @@ Whenever the load is increasing we create another POD not another container in a
 POD have one-to-one relationship with the container. But we can create multiple container within a POD.
 <br>
 Sometimes it can make sense, for ex: a helper container maybe for some reason it needs to be able to communicate
-within the container where they live in one pod.
+within the container where they live in one POD.
+
+Example POD definition file
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgres
+  labels:
+    tier: db-tier
+spec:
+  containers:
+    - name: postgres
+      image: postgres
+      env:
+        - name: POSTGRES_PASSWORD
+          value: mysecretpassword
+```
 
 ## YAML
 Lets look at a little bit about YAML file.
@@ -78,3 +96,83 @@ kind : Refers to the type of object we are trying to create. For ex: Pod, servic
 metadata: Information about the object like its name, labels etc. This is form of a dictionary.
 <br>
 spec: Additonal information field. For ex: containers
+
+## Replication Controller
+* It ensures that specified number of PODs are running at all times. It provides HA.
+* Another thing that it provides us is to create multiple PODs to share the load. Load Balancing and Scaling
+* Replication Controller and Replica Set can be comparable. They do same purposes but Replication Controller is legacy 
+and recommended to use Replica Set.
+* There is a difference when defining a sample yaml file for both of them which is labels and selectors. This option is 
+available in replica set. We just label PODs that we create and in the selector section provide this label name.
+This way replica set know which PODs to monitor.
+
+Example ReplicaSet File
+```
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+  labels:
+    app: mywebsite
+    tier: frontend
+spec:
+  replicas: 4
+  template:
+    metadata:
+      name: myapp-POD
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+  selector:
+    matchLabels:
+      app: myapp
+```
+
+## Deployments
+* Provides deployment features like rolling updates.
+* When we create a deployment, it creates replicaset and then replicaset creates PODs.
+
+Example Deployment File, similar with ReplicaSet except kind field.
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: mywebsite
+    tier: frontend
+spec:
+  replicas: 4
+  template:
+    metadata:
+      name: myapp-POD
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+  selector:
+    matchLabels:
+      app: myapp
+```
+
+### Rollout
+When you first create a deployment, it triggers a rollout. A new rollout create a new deployment revision like revision1.
+<br>
+In the future when a container upgraded, a new rollout is triggered and a new deployment revision is created like revision2.
+<br>
+This helps us keep track of the changes made to our deployment and enables us to roll back to a previous revision.
+
+#### Deployment Strategies
+There are two types of strategies.
+* The first one is to remove all PODs and create new ones. This strategy is called Recreate and it's not the default strategy.
+* The second one is to remove one PODs then creates new one one by one. This is called Rolling Update. This is the default strategy.
+
+* Under the hood, when we upgrade a newer version, Kubernetes creates a new ReplicaSet, creates one POD in new ReplicaSet
+remove one POD in previous ReplicaSet. This way all the PODs are created in new ReplicaSet.
+* When you want to rollback the rollout the opposite way of this arhchitecture work.
