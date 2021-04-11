@@ -176,3 +176,52 @@ There are two types of strategies.
 * Under the hood, when we upgrade a newer version, Kubernetes creates a new ReplicaSet, creates one POD in new ReplicaSet
 remove one POD in previous ReplicaSet. This way all the PODs are created in new ReplicaSet.
 * When you want to rollback the rollout the opposite way of this arhchitecture work.
+
+## Networking
+* Ip address is assigned to a POD unlike docker. Docker assigned ip address to a container.
+When Kubernetes initialized in a system, it creates a private internal network with the ip address 10.24.0.0.
+When new PODs are created, they get assigned an ip address from this network. PODs can communicate each other through this ip.
+
+When you first initialize a cluster, all the nodes creates this private internal network in their own.
+But the problem is when you communicate PODs from one node to another node, then it is possible to have IP conflict.
+<br>
+Kubernetes doesn't provide a solution to solve this problem when you first initialize the cluster.
+It expects from us to make it correct way.
+<br>
+The rules we need to follow:
+* All containers/PODs can communicate to one another without NAT.
+* All nodes can communicate with all containers and vice-versa without NAT.
+It is our responsibility to setup the network in the correct way.
+
+But there are some products to handle this problem like Cisco FCI, Vmware NSX, flannel, cilium.
+
+## Services
+Helps us to connect applications together with other applications or users.
+For ex; front-end PODs to backend-PODs or users to front-end PODs.
+Enables loose coupling between microservices in our application.
+
+<br>
+These are the services types:
+* NodePort : Service objects listen to request coming to node in your cluster and then forward this request to the related POD.
+* ClusterIp : Service objects create a virtual IP inside the cluster to enable communication between different services.
+* Load Balancer : Provisions a load balancer for our application in supported cloud providers.
+<br>
+
+### Node Port
+![](images/1.PNG)
+There are 3 ports exist.
+* First port in the image are called Target Port. This is exposed in the POD.
+* Second port in the image are called Port. It forward request from Service to POD. Service object is like a virtual server inside
+the node. Inside the cluster it has its own ip address and that ip address is called the cluster ip of the service.
+* Third port in the image are called Node Port. This for accessing the web server externally. Node ports can only 
+be in a valid range which by default is from 30000 to 32767.
+
+### Cluster IP
+As you know, PODs may go down and go up. So, in order to communicate PODs we need to define dynamic ip.
+Cluster IP, provides a single interface for related PODs. 
+
+![](images/2.PNG)
+
+### Load Balancer
+When we want users to interact with our applications we can use this type of Service object, to be able to
+provide a single domain name. This service can be integrated with cloud providers.
