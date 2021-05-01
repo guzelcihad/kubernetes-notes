@@ -91,7 +91,7 @@ Deployment | apps/v1 | 283 |
 
 apiVersion : This is the version of the Kubernetes API you're using to create the objects.
 <br>
-kind : Refers to the type of object we are trying to create. For ex: Pod, service, replicaset, deployment
+kind : Refers to the type of object we are trying to create. For ex: POD, service, replicaset, deployment
 <br>
 metadata: Information about the object like its name, labels etc. This is form of a dictionary.
 <br>
@@ -130,6 +130,34 @@ spec:
     matchLabels:
       app: myapp
 ```
+### Labels and Selectors
+Replication Controller monitors the PODs to decide its desired actions.
+There are lots of PODs exist in the cluster so how Replication Controller understands
+the which PODs to monitor?
+<br>
+This is where Labels and Selectors come to the rescue.
+When defining a POD definition, we use label and then use this label in the Replication Controller
+definition file. This is the same behaviour almost in all other objects in Kubernetes.
+<br>
+Here is an example:
+
+pod-definition.yml
+```
+metadata:
+  name: myapp-pod
+  labels:
+    tier: front-end
+```
+
+replicaset-definition.yml
+```
+selector:
+  matchLabels:
+    tier: front-end
+```
+
+
+
 
 ## Deployments
 * Provides deployment features like rolling updates.
@@ -225,3 +253,33 @@ Cluster IP, provides a single interface for related PODs.
 ### Load Balancer
 When we want users to interact with our applications we can use this type of Service object, to be able to
 provide a single domain name. This service can be integrated with cloud providers.
+
+## Namespaces
+It is logical place where we keep resources. For ex: deployments, replicasets, pods
+We can create namespaces for different environments for ex.
+Kubernetes creates a namespace by default for its internal configurations.
+
+For ex: if we create a pod
+```
+kubectl create -f pod-definition.yml
+```
+it exists under the default namespace.
+To be able to create it under another namespaces, simply use
+```
+kubectl create -f pod-definition.yml --namespace=dev
+```
+Or simply use namespace in yml file under metadata section.
+
+* Creating namespace
+```
+kubectl create namespace dev
+```
+or with a yml file.
+
+The contents of the file is:
+```
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+```
