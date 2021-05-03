@@ -288,7 +288,7 @@ metadata:
 ## ConfigMaps
 We can define configs in yaml file. But ConfigMap allows us to define configs in one place.
 We first define ConfigMaps then inject it into PODs.
-# Definition
+### Definition
 There are two ways to define ConfigMap.
 * Imperative way
 ```
@@ -339,7 +339,7 @@ kubectl get configmaps
 ```
 kubectl describe configmaps
 ```
-# Injection
+### Injection
 Under the spec section we simply create new tags.
 For ex:
 ```
@@ -391,7 +391,7 @@ kubectl get secrets
 ```
 kubectl describe secrets
 ```
-# Injection
+### Injection
 Under the spec section we simply create new tags.
 For ex:
 ```
@@ -399,3 +399,50 @@ envFrom:
   - secretRef:
       name: app-secret  // name of the secret
 ```
+
+## Service Account
+There are two types of account in Kubernetes. User and Service
+User accounts used by admin or developers
+Service accounts used by services like Prometheus, Jenkins
+
+Creating an account
+```
+kubectl create service account <name>
+```
+```
+kubectl get serviceaccount
+```
+* When a service account created a Token assigned to this service account.
+This token will be use by the service to authenticate the Kubernetes.
+This token stored as a Secret object.
+To view the token assigned to the Service Account
+
+```
+kubectl describe secret <service-account-token-name>
+```
+
+## Resource Requirements
+??? LAter on
+
+## Taints and Tolerations
+??? Later on
+
+## Node Selectors
+??? Later on
+
+## Node Affinity
+??? Later on
+
+# MultiContainer PODs
+There are multiple patterns.
+
+There must be sometimes where multiple components need to work together.
+For ex: a log agent can run with web server. They can share the same network and storage.
+
+![](images/3.PNG)
+
+We can add the container image definition in the pod definition file.
+
+![](images/4.PNG)
+
+## Design Patterns
