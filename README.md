@@ -283,3 +283,119 @@ kind: Namespace
 metadata:
   name: dev
 ```
+
+# Configuration
+## ConfigMaps
+We can define configs in yaml file. But ConfigMap allows us to define configs in one place.
+We first define ConfigMaps then inject it into PODs.
+# Definition
+There are two ways to define ConfigMap.
+* Imperative way
+```
+kubectl create configmap
+  <config-name> --from-literal=<key>=<value>
+```
+For ex:
+Creates a config for 
+APP_COLOR:blue 
+APP_MODE: prod
+
+```
+kubectl create configmap \
+  app-config --from-literal=APP_COLOR=blue \
+             --from-literal=APP_MODE=prod
+```
+OR FROM A FILE
+```
+kubectl create configmap
+  <config-name>  --from-file=<path-to-file>
+```
+For ex:
+```
+kubectl create configmap \
+  app-config --from-file=app_config.properties
+```
+
+* Declarative way
+```
+kubectl create -f config-map.yaml
+```
+config-map.yaml
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_COLOR: blue
+  APP_MODE: prod
+```
+
+* View ConfigMaps
+```
+kubectl get configmaps
+```
+* Details
+```
+kubectl describe configmaps
+```
+# Injection
+Under the spec section we simply create new tags.
+For ex:
+```
+envFrom:
+  - configMapRef:
+      name: app-config  // name of the configmap
+```
+There are also another way of injecting, for ex: injecting only one config.
+
+## Secrets
+Similar to ConfigMaps, useful for sensitive data. For ex: storing db host, db user, db password.
+First create a secret then inject into pod definition.
+* Imperative way
+```
+kubectl create secret generic
+  <secret-name> --from-literal=<key>=<value>
+```
+
+```
+kubectl create secret generic \
+  app-secret --from-literal=APP_COLOR=blue \
+             --from-literal=APP_MODE=prod
+```
+OR FROM A FILE
+```
+kubectl create secret generic
+  <secret-name>  --from-file=<path-to-file>
+```
+* Declarative way
+```
+kubectl create -f secret-data.yaml
+```
+secret-data.yaml
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+data:
+  DB_HOST: mysql
+  DB_Password: pass
+```
+
+* View ConfigMaps
+```
+kubectl get secrets
+```
+* Details
+```
+kubectl describe secrets
+```
+# Injection
+Under the spec section we simply create new tags.
+For ex:
+```
+envFrom:
+  - secretRef:
+      name: app-secret  // name of the secret
+```
