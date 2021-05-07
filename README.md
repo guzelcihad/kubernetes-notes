@@ -633,3 +633,24 @@ kubectl get pods --selector app=App1
 ```
 
 ## Rolling Updates and Rolbacks
+```
+kubectl rollout status deployment/<my-deployment>
+
+kubectl rollout history deployment/<my-deployment>
+
+kubectl rollout undo deployment/<mp-deployment>
+```
+
+## Jobs
+
+
+## Services
+
+### Ingres Networking
+Built in load balancer lives with Kubernetes.
+![](images/11.PNG)
+
+Nginx is supported by Kubernetes. We simply deploy an Nginx Deployment 
+
+### Network Policies
+Allow rules based for POD. It is like security group in AWS
