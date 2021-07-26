@@ -341,13 +341,21 @@ kubectl describe configmaps
 ```
 ### Injection
 Under the spec section we simply create new tags.
-For ex:
+This way we load all configs
 ```
 envFrom:
   - configMapRef:
       name: app-config  // name of the configmap
 ```
-There are also another way of injecting, for ex: injecting only one config.
+Injecting only one config
+```
+env:
+  - name: APP_COLOR
+    valueFrom:
+      configMapKeyRef:
+        name: app-config
+        key: APP_COLOR
+```
 
 ## Secrets
 Similar to ConfigMaps, useful for sensitive data. For ex: storing db host, db user, db password.
@@ -654,3 +662,16 @@ Nginx is supported by Kubernetes. We simply deploy an Nginx Deployment
 
 ### Network Policies
 Allow rules based for POD. It is like security group in AWS
+
+# State Persistence
+In docker, the data live within the container. If the containes dies then the data live within also.
+To persist data we use volumes. Its same in the Kubernetes.
+![](images/13.PNG)
+
+We can use storage solutions to work with Kubernetes. For ex: AWS EBS
+This way volume storage will now be located in AWS.
+
+## Persistent Volumes
+
+
+## Storage Classes
